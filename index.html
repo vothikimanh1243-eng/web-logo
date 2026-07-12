@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công Cụ tính điểm và học lực cấp 3</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px auto;
+            max-width: 500px;
+            background-color: #f4f7f6;
+            color: #333;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .container {
+            background: white;
+            padding: 30px 20px 40px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* CSS Logo góc trên bên phải được tối ưu không bị đè chữ */
+        .logo-goc {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 2px solid #007bff;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+            object-fit: cover;
+        }
+
+        h2 {
+            color: #007bff;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 20px;
+            text-transform: uppercase;
+            padding-right: 60px; /* Chừa khoảng trống cho logo */
+        }
+        h3 {
+            font-size: 13px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin-top: -5px;
+            margin-bottom: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .tab-btn {
+            padding: 10px 5px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #6c757d;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 50%;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .tab-btn.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+
+        .thong-ke {
+            display: flex;
+            justify-content: space-around;
+            background-color: #f8f9fa;
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+            font-size: 12px;
+        }
+        .tk-item { text-align: center; }
+        .tk-so { display: block; font-size: 15px; font-weight: bold; }
+        .online { color: #28a745; }
+        .tong-vp { color: #6c757d; }
+        .cham-xanh {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #28a745;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: nhap_nhay 1.5s infinite;
+        }
+        @keyframes nhap_nhay {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+
+        /* Khung lưới nhập điểm ở tab tính điểm môn (2 cột) */
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .input-group {
+            margin-bottom: 0;
+            background: #fdfdfd;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        select {
+            width: 100%; padding: 10px; margin-bottom: 15px;
+            border-radius: 5px; border: 1px solid #007bff;
+            font-size: 14px; font-weight: bold; color: #007bff; background-color: #f0f8ff;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%; padding: 12px; background-color: #007bff; color: white;
+            border: none; border-radius: 5px; font-size: 15px; font-weight: bold;
+            cursor: pointer; transition: background 0.3s; margin-bottom: 8px;
+            box-sizing: border-box;
+        }
+        button:hover { background-color: #0056b3; }
+
+        .result {
+            margin-top: 15px; font-size: 17px; font-weight: bold;
+            text-align: center; color: #28a745; padding: 10px; border-top: 2px dashed #eee;
+        }
+        .formula-note { font-size: 12px; color: #666; font-style: italic; margin-bottom: 15px; text-align: center; }
+
+        .btn-ai { background-color: #6f42c1; }
+        .btn-ai:hover { background-color: #59359a; }
+
+        .ai-box {
+            display: none; margin-top: 15px; padding: 12px;
+            background-color: #f3f0fa; border-left: 4px solid #6f42c1; border-radius: 4px;
+            text-align: left; font-size: 13px; line-height: 1.4;
+        }
+        .ai-title { font-weight: bold; color: #6f42c1; margin-bottom: 5px; display: flex; align-items: center; }
+        .ai-icon { margin-right: 6px; font-size: 15px; }
+
+        /* Lưới hai cột cho tab Xét Danh Hiệu */
+        .mon-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .mon-item {
+            background: #fdfdfd;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+        }
+        .mon-item label { font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px; text-align: left; }
+        .mon-item input, .mon-item select { padding: 8px; font-size: 13px; margin-bottom: 0; width: 100%; box-sizing: border-box; }
+        .mon-item.nhan-xet { background-color: #fffde6; border-color: #ffeeba; grid-column: span 1; }
+        .mon-item.nhan-xet-full { grid-column: span 2; background-color: #fffde6; border-color: #ffeeba; }
+
+        /* Nút đổi giao diện */
+        .theme-btn{
+            position:absolute;top:2px;left:15px;z-index:999;width:auto;padding:8px 12px;margin:0;
+            font-size:13px;font-weight:bold;
+            background:linear-gradient(135deg,#007bff,#4da3ff);
+            color:#fff;border:none;border-radius:20px;cursor:pointer;
+            transition:.3s;box-shadow:0 3px 10px rgba(0,123,255,.35)}
+        .theme-btn:hover{transform:scale(1.05)}
+        body.dark .theme-btn{
+            background:linear-gradient(135deg,#2d3748,#4a5568);
+            box-shadow:0 3px 10px rgba(255,255,255,.15)
+        }
+        body.dark{background:#121212;color:#eee}
+        body.dark .container{background:#1f1f1f;color:#eee;box-shadow:0 5px 15px rgba(255,255,255,.05)}
+        body.dark h2{color:#66b3ff} body.dark h3{color:#cfcfcf}
+        body.dark .input-group,body.dark .mon-item{background:#2b2b2b;border-color:#444}
+        body.dark input,body.dark select{background:#333;color:#fff;border:1px solid #555}
+        body.dark .formula-note,body.dark label{color:#ddd}
+        body.dark .tabs,body.dark .thong-ke{border-color:#444}
+        body.dark .thong-ke{background:#2b2b2b}
+        body.dark .result{color:#7CFC98}
+        body.dark .ai-box{background:#2d243b;color:#fff}
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button id="themeBtn" class="theme-btn" onclick="toggleTheme()">🌙 Chế độ tối</button>
+    <img src="img.png" class="logo-goc">
+
+    <h2 id="tieuDeChinh">TÍNH ĐIỂM C3</h2>
+    <h3 id="tieuDePhu">⚠*Lưu ý ghi số điểm thập phân thì dùng dấu (.)</h3>
+    <h3 id="tieuDePhu">⚠*Lưu ý bạn hãy tự làm tròn điểm của mình ví dụ 9.25->9.3, hệ thống chỉ tính theo số bạn đã cho</h3>
+    <h3 id="tieuDePhu">🕐tôi sẽ cập nhật logo cho cái web này nhưng hơi lâu chút</h3>
+
+    <div class="thong-ke">
+        <div class="tk-item">
+            <span class="tk-so online" id="soOnline"><span class="cham-xanh"></span>2</span>
+            <span>Đang dùng</span>
+        </div>
+        <div class="tk-item">
+            <span class="tk-so tong-vp" id="tongTruyCap">148</span>
+            <span>Tổng truy cập</span>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="chuyenTab('tabMon')">🧮 Tính Điểm Môn</button>
+        <button class="tab-btn" onclick="chuyenTab('tabDanhHieu')">🏆 Xét Danh Hiệu Cả Năm</button>
+    </div>
+
+    <div id="vungTabMon">
+        <label for="hocKy" style="font-weight: bold; display: block; text-align: left; margin-bottom: 5px;">Chọn Chế Độ Tính:</label>
+        <select id="hocKy" onchange="capNhatDanhSachMon()">
+            <option value="1">Học Kỳ 1🔅</option>
+            <option value="2">Học Kỳ 2❗</option>
+            <option value="cn">Cả Năm (CN)‼</option>
+        </select>
+
+        <div id="vungHocKy">
+            <label for="monHoc" style="font-weight: bold; display: block; text-align: left; margin-bottom: 5px;">Chọn Môn Học:</label>
+            <select id="monHoc" onchange="xuLyGiaoDien()">
+            </select>
+
+            <div id="formula" class="formula-note">Công thức: ...</div>
+
+            <div class="input-grid">
+                <div class="input-group" id="group-tx1"><label id="lbl-tx1">TX1:</label><input type="number" id="tx1" min="0" max="10" step="0.1" placeholder="Nhập điểm"></div>
+                <div class="input-group" id="group-tx2"><label id="lbl-tx2">TX2:</label><input type="number" id="tx2" min="0" max="10" step="0.1" placeholder="Nhập điểm"></div>
+                <div class="input-group" id="group-tx3"><label id="lbl-tx3">TX3:</label><input type="number" id="tx3" min="0" max="10" step="0.1" placeholder="Nhập điểm"></div>
+                <div class="input-group" id="group-tx4"><label id="lbl-tx4">TX4:</label><input type="number" id="tx4" min="0" max="10" step="0.1" placeholder="Nhập điểm"></div>
+                <div class="input-group" id="group-tx5" style="display: none;"><label id="lbl-tx5">TX5:</label><input type="number" id="tx5" min="0" max="10" step="0.1" placeholder="Nhập điểm"></div>
+                <div class="input-group" id="group-gk"><label id="lbl-gk">Giữa Kỳ (Hệ số 2):</label><input type="number" id="gk" min="0" max="10" step="0.1" placeholder="Nhập điểm"></div>
+                <div class="input-group" id="group-ck"><label id="lbl-ck">Cuối Kỳ (Hệ số 3):</label><input type="number" id="ck" min="0" max="10" step="0.1" placeholder="Nhập điểm"></div>
+            </div>
+        </div>
+
+        <div id="vungCaNam" style="display: none;">
+            <div class="formula-note">Công thức: (ĐTB môn HK1 + ĐTB môn HK2 * 2) / 3</div>
+            <div class="input-group" style="margin-bottom: 12px;">
+                <label>Điểm Trung Bình Môn Học Kỳ 1🔅</label>
+                <input type="number" id="dtbHk1" min="0" max="10" step="0.01" placeholder="Nhập ĐTB HK1">
+            </div>
+            <div class="input-group" style="margin-bottom: 12px;">
+                <label>Điểm Trung Bình Môn Học Kỳ 2❗</label>
+                <input type="number" id="dtbHk2" min="0" max="10" step="0.01" placeholder="Nhập ĐTB HK2">
+            </div>
+        </div>
+
+        <button onclick="tinhDiemMon()">Tính Điểm Trung Bình</button>
+        <button onclick="aiPhanTichMon()" class="btn-ai" id="btnAiText">🤖 AI Khen Ngợi Điểm Số</button>
+    </div>
+
+    <div id="vungTabDanhHieu" style="display: none;">
+        <div class="formula-note" style="color: #28a745; margin-bottom: 15px; font-weight: bold;">
+            * Môn nào không nhập điểm hệ thống sẽ tự động bỏ qua không tính toán!
+        </div>
+
+        <div class="mon-grid">
+            <div class="mon-item" id="item-toan"><label>Toán Học:</label><input type="number" class="diem-dh" min="0" max="10" step="0.1" placeholder="Trống = Bỏ qua"></div>
+            <div class="mon-item" id="item-van"><label>Ngữ Văn:</label><input type="number" class="diem-dh" min="0" max="10" step="0.1" placeholder="Trống = Bỏ qua"></div>
+
+            <div class="mon-item" id="item-anh"><label>Ngoại Ngữ:</label><input type="number" class="diem-dh" min="0" max="10" step="0.1" placeholder="Trống = Bỏ qua"></div>
+            <div class="mon-item" id="item-ly"><label>Vật Lý:</label><input type="number" class="diem-dh" min="0" max="10" step="0.1" placeholder="Trống = Bỏ qua"></div>
+
+            <div class="mon-item" id="item-hoa"><label>Hóa Học:</label><input type="number" class="diem-dh" min="0" max="10" step="0.1" placeholder="Trống = Bỏ qua"></div>
+            <div class="mon-item" id="item-sinh"><label>Sinh Học:</label><input type="number" class="diem-dh" min="0" max="10" step="0.1" placeholder="Trống = Bỏ qua"></div>
+
+            <div class="mon-item" id="item-su"><label>Lịch Sử:</label><input type="number" class="diem-dh" min="0" max="10" step="0.1" placeholder="Trống = Bỏ qua"></div>
+            <div class="mon-item" id="item-dia"><label>Địa Lý:</label><input type="number" class="diem-dh" min="0" max="10" step="0.1" placeholder="Trống = Bỏ qua"></div>
+
+            <div class="mon-item" id="item-tin"><label>Tin Học:</label><input type="number" class="diem-dh" min="0" max="10" step="0.1" placeholder="Trống = Bỏ qua"></div>
+            <div class="mon-item" id="item-gdkt"><label>GDKT & Pháp Luật:</label><input type="number" class="diem-dh" min="0" max="10" step="0.1" placeholder="Trống = Bỏ qua"></div>
+
+            <div class="mon-item" id="item-gdqp"><label>GDQP & An Ninh:</label><input type="number" class="diem-dh" min="0" max="10" step="0.1" placeholder="Trống = Bỏ qua"></div>
+            <div class="mon-item" id="item-cn"><label>Công Nghệ:</label><input type="number" class="diem-dh" min="0" max="10" step="0.1" placeholder="Trống = Bỏ qua"></div>
+
+            <div class="mon-item nhan-xet" id="item-td">
+                <label>Thể Dục / GDTC:</label>
+                <select class="diem-nx-dh"><option value="Dat">Đạt</option><option value="CDat">Chưa Đạt</option></select>
+            </div>
+
+            <div class="mon-item nhan-xet" id="item-hdtx">
+                <label>HĐ Trải Nghiệm, Hướng Nghiệp:</label>
+                <select class="diem-nx-dh"><option value="Dat">Đạt</option><option value="CDat">Chưa Đạt</option></select>
+            </div>
+
+            <div class="mon-item nhan-xet-full" id="item-nddp">
+                <label>Nội Dung Giáo Dục Địa Phương:</label>
+                <select class="diem-nx-dh"><option value="Dat">Đạt</option><option value="CDat">Chưa Đạt</option></select>
+            </div>
+        </div>
+
+        <button onclick="tinhDanhHieuCaNam()" style="background-color: #28a745;">📊 Kiểm Tra Danh Hiệu Học Sinh</button>
+    </div>
+
+    <div class="result" id="ketQua"></div>
+
+    <div class="ai-box" id="aiBox">
+        <div class="ai-title" id="aiTitleBox"><span class="ai-icon">✨</span> Trợ Lý AI Phân Tích:</div>
+        <div id="aiNoiDung">Đang phân tích dữ liệu...</div>
+    </div>
+</div>
+
+<script>
+    let diemTrungBinhMonHienTai = -1;
+    let danhHieuToanQuoc = "";
+    let tabHienTai = "tabMon";
+
+    function chuyenTab(tenTab) {
+        tabHienTai = tenTab;
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('ketQua').innerText = "";
+        document.getElementById('aiBox').style.display = "none";
+
+        if (tenTab === 'tabMon') {
+            document.querySelector('[onclick="chuyenTab(\'tabMon\')"]').classList.add('active');
+            document.getElementById('vungTabMon').style.display = "block";
+            document.getElementById('vungTabDanhHieu').style.display = "none";
+            document.getElementById('tieuDeChinh').innerText = "TÍNH ĐIỂM TRUNG BÌNH MÔN";
+            capNhatDanhSachMon();
+            const b=document.getElementById('themeBtn');if(b&&document.body.classList.contains('dark'))b.innerHTML='☀️ Chế độ sáng';
+        } else {
+            document.querySelector('[onclick="chuyenTab(\'tabDanhHieu\')"]').classList.add('active');
+            document.getElementById('vungTabMon').style.display = "none";
+            document.getElementById('vungTabDanhHieu').style.display = "block";
+            document.getElementById('tieuDeChinh').innerText = "XÉT DANH HIỆU CẢ NĂM";
+        }
+    }
+
+    function capNhatThongKe() {
+        let tongLuot = localStorage.getItem('tongTruyCap') || 200;
+        tongLuot = parseInt(tongLuot) + 1;
+        localStorage.setItem('tongTruyCap', tongLuot);
+        document.getElementById('tongTruyCap').innerText = tongLuot;
+
+        setInterval(function() {
+            let ngauNhienOnline = Math.floor(Math.random() * 8) + 2;
+            document.getElementById('soOnline').innerHTML = `<span class="cham-xanh"></span>${ngauNhienOnline}`;
+        }, 4000);
+    }
+
+    function capNhatDanhSachMon() {
+        if (tabHienTai !== "tabMon") return;
+        let hk = document.getElementById('hocKy').value;
+        let vungHocKy = document.getElementById('vungHocKy');
+        let vungCaNam = document.getElementById('vungCaNam');
+        let monSelect = document.getElementById('monHoc');
+        let btnAiText = document.getElementById('btnAiText');
+
+        diemTrungBinhMonHienTai = -1;
+
+        if (hk === "cn") {
+            vungHocKy.style.display = "none";
+            vungCaNam.style.display = "block";
+            document.getElementById('tieuDeChinh').innerText = "TÍNH ĐIỂM TRUNG BÌNH MÔN CẢ NĂM";
+            btnAiText.innerText = "📊 AI Xét Học Lực Môn Cả Năm";
+            return;
+        }
+
+        vungHocKy.style.display = "block";
+        vungCaNam.style.display = "none";
+        btnAiText.innerText = "🤖 AI Khen Ngợi Điểm Số";
+        monSelect.innerHTML = "";
+
+        if (hk === "1") {
+            monSelect.innerHTML = `
+        <option value="hk1_nhom4tx">Toán, Ngữ Văn, Ngoại Ngữ (chia 9)</option>
+        <option value="hk1_nhom3tx">Lý, Hóa, Sinh, Tin, Sử, Địa, GDKT&PL, CN (chia 8)</option>
+        <option value="hk1_gdqp">Giáo Dục Quốc Phòng (chia 7)</option>
+      `;
+        } else {
+            monSelect.innerHTML = `
+        <option value="nhom1">Vật Lý, Hóa Học, Ngữ Văn, Ngoại Ngữ, Địa Lý, GDKT&PL, CN (chia 9)</option>
+        <option value="toan">Toán Học (chia 10)</option>
+        <option value="nhom3">Tin Học, Sinh Học, Lịch Sử (chia 8)</option>
+        <option value="gdqp">Giáo Dục Quốc Phòng (chia 7)</option>
+      `;
+        }
+        xuLyGiaoDien();
+    }
+
+    function xuLyGiaoDien() {
+        let hk = document.getElementById('hocKy').value;
+        if (hk === "cn" || tabHienTai !== "tabMon") return;
+
+        let mon = document.getElementById('monHoc').value;
+        let txtNote = document.getElementById('formula');
+        document.getElementById('tieuDeChinh').innerText = "TÍNH ĐIỂM MÔN HỌC KỲ " + hk;
+
+        document.getElementById('lbl-gk').innerText = `Giữa Kỳ ${hk} (Hệ số 2):`;
+        document.getElementById('lbl-ck').innerText = `Cuối Kỳ ${hk} (Hệ số 3):`;
+
+        let soTX = 0;
+        if (mon === 'hk1_nhom4tx' || mon === 'nhom1') soTX = 4;
+        else if (mon === 'toan') soTX = 5;
+        else if (mon === 'hk1_nhom3tx' || mon === 'nhom3') soTX = 3;
+        else if (mon === 'hk1_gdqp' || mon === 'gdqp') soTX = 2;
+
+        txtNote.innerText = `Công thức tính: Tổng điểm hệ số / ${(mon==='toan')?10:(mon==='hk1_nhom4tx'||mon==='nhom1')?9:(mon==='hk1_nhom3tx'||mon==='nhom3')?8:7}`;
+
+        document.getElementById('group-tx3').style.display = (soTX >= 3) ? 'block' : 'none';
+        document.getElementById('group-tx4').style.display = (soTX >= 4) ? 'block' : 'none';
+        document.getElementById('group-tx5').style.display = (soTX >= 5) ? 'block' : 'none';
+    }
+
+    window.onload = function() {
+        if(localStorage.getItem('theme')==='dark'){document.body.classList.add('dark');}
+        capNhatThongKe();
+        capNhatDanhSachMon();
+    };
+
+    function tinhDiemMon() {
+        let hk = document.getElementById('hocKy').value;
+        if (hk === "cn") {
+            let hk1 = parseFloat(document.getElementById('dtbHk1').value) || 0;
+            let hk2 = parseFloat(document.getElementById('dtbHk2').value) || 0;
+            diemTrungBinhMonHienTai = (hk1 + (hk2 * 2)) / 3;
+            document.getElementById('ketQua').innerText = "ĐTB Môn Cả Năm: " + diemTrungBinhMonHienTai.toFixed(2);
+            return;
+        }
+
+        let mon = document.getElementById('monHoc').value;
+        let tx1 = parseFloat(document.getElementById('tx1').value) || 0;
+        let tx2 = parseFloat(document.getElementById('tx2').value) || 0;
+        let tx3 = parseFloat(document.getElementById('tx3').value) || 0;
+        let tx4 = parseFloat(document.getElementById('tx4').value) || 0;
+        let tx5 = parseFloat(document.getElementById('tx5').value) || 0;
+        let gk = parseFloat(document.getElementById('gk').value) || 0;
+        let ck = parseFloat(document.getElementById('ck').value) || 0;
+
+        if (mon === 'hk1_nhom4tx' || mon === 'nhom1') diemTrungBinhMonHienTai = (tx1 + tx2 + tx3 + tx4 + (gk * 2) + (ck * 3)) / 9;
+        else if (mon === 'toan') diemTrungBinhMonHienTai = (tx1 + tx2 + tx3 + tx4 + tx5 + (gk * 2) + (ck * 3)) / 10;
+        else if (mon === 'hk1_nhom3tx' || mon === 'nhom3') diemTrungBinhMonHienTai = (tx1 + tx2 + tx3 + (gk * 2) + (ck * 3)) / 8;
+        else if (mon === 'hk1_gdqp' || mon === 'gdqp') diemTrungBinhMonHienTai = (tx1 + tx2 + (gk * 2) + (ck * 3)) / 7;
+
+        document.getElementById('ketQua').innerText = "Điểm trung bình môn: " + diemTrungBinhMonHienTai.toFixed(2);
+    }
+
+    function aiPhanTichMon() {
+        let aiBox = document.getElementById('aiBox');
+        let aiNoiDung = document.getElementById('aiNoiDung');
+        let aiTitleBox = document.getElementById('aiTitleBox');
+        let hk = document.getElementById('hocKy').value;
+
+        if (diemTrungBinhMonHienTai === -1) {
+            alert("Vui lòng tính điểm trung bình môn trước!");
+            return;
+        }
+
+        aiBox.style.display = "block";
+        aiNoiDung.innerHTML = "<em>AI đang đọc bảng điểm...</em>";
+
+        setTimeout(function() {
+            let dtb = parseFloat(diemTrungBinhMonHienTai.toFixed(2));
+            let msg = "";
+
+            if (hk === "1" || hk === "2") {
+                aiTitleBox.innerHTML = `✨ AI Khen Ngợi & Động Viên:`;
+                if (dtb >= 8.0) msg = `🔥 <b>Giỏi quá nha!</b> Kết quả <b>${dtb}</b> chứng minh bạn cực kỳ siêng năng. Xứng đáng có được giấy khen để lên CapCut giựt giựt banh máy!`;
+                else if (dtb >= 6.5) msg = `👍 <b>Khá tốt!</b> Đạt mức Khá với <b>${dtb}</b> điểm. Tiềm năng lên Giỏi rất cao, cố lên học sinh giỏi để giựt giựt flex với bạn bè nhé!`;
+                else msg = `💪 Điểm môn đạt <b>${dtb}</b>. Qua môn an toàn rồi nhưng cần chú ý tăng tốc ở học kỳ sau để đạt kết quả rực rỡ hơn nha!`;
+            } else {
+                aiTitleBox.innerHTML = `📊 Hội Đồng AI Xét Học Lực Môn (Cả Năm):`;
+                if (dtb >= 9.0) msg = `🏆 XUẤT SẮC!!, wow bạn đã được 1 môn trên 9 rồi chỉ cần ít nhất 6 môn trên 9 với mấy môn còn lại trên 6.5 và Đạt nhận xét là được học sinh xuất sắc!! <b>${dtb}</b>. Học lực thành phần đạt mức <b>XUẤT SẮC</b>! Quá đỉnh cao luôn bạn ơi!`;
+                else if (dtb >= 8.0) msg = `🏅 GIỎI!! bạn đã được một môn trên 8 rồi chỉ cần ít nhất 6 môn trên 8 với mấy môn còn lại trên 6.5 và Đạt nhận xét là bạn được học sinh giỏi rồi! <b>${dtb}</b>. Xếp loại thành phần môn: <b>GIỎI</b>. Giữ vững phong độ này nhé!`;
+                else if (dtb >= 6.5) msg = `📈 KHÁ! điểm cũng ổn rồi chỉ cần bạn ko dưới trung bình thì bạn đã là người nỗ lực rồi năm sau làm lại <b>${dtb}</b> (Mức <b>KHÁ</b>). Một sự nỗ lực rất đáng ghi nhận.`;
+                else msg = `✅ ĐẠT ôi cố gắng cho năm sau nha <b>${dtb}</b>. Đã ở mức <b>ĐẠT</b>, hạ cánh an toàn không lo thi lại hè!`;
+            }
+            aiNoiDung.innerHTML = msg;
+        }, 600);
+    }
+
+    function tinhDanhHieuCaNam() {
+        const danhSachIdMonDiem = [
+            "item-toan", "item-van", "item-anh", "item-ly", "item-hoa",
+            "item-sinh", "item-su", "item-dia", "item-tin", "item-gdkt", "item-gdqp", "item-cn"
+        ];
+
+        let dsDiemThucTe = [];
+        let duLieuHopLe = true;
+
+        danhSachIdMonDiem.forEach(id => {
+            let oInput = document.querySelector(`#${id} input`);
+            if (oInput) {
+                let giaTriChu = oInput.value.trim();
+                if (giaTriChu !== "") {
+                    let diemSo = parseFloat(giaTriChu);
+                    if (isNaN(diemSo) || diemSo < 0 || diemSo > 10) {
+                        duLieuHopLe = false;
+                    } else {
+                        dsDiemThucTe.push(diemSo);
+                    }
+                }
+            }
+        });
+
+        if (!duLieuHopLe) {
+            alert("🤖Nhập điểm gì vậy điểm ngta từ 0.0->10.0, nhập lại cho hệ thống xét");
+            return;
+        }
+
+        if (dsDiemThucTe.length === 0) {
+            alert("🤖Đùa à chưa nhập điểm mà đòi xét, ghi vô rồi hệ thống xét");
+            return;
+        }
+
+        let tatCaMonNhanXetDat = true;
+        const danhSachSelects = document.querySelectorAll('.diem-nx-dh');
+        danhSachSelects.forEach(sel => {
+            if (sel.value === "CDat") {
+                tatCaMonNhanXetDat = false;
+            }
+        });
+
+        let soMonTren9 = dsDiemThucTe.filter(d => d >= 9.0).length;
+        let soMonTren8 = dsDiemThucTe.filter(d => d >= 8.0).length;
+        let soMonTren65 = dsDiemThucTe.filter(d => d >= 6.5).length;
+        let diemThapNhat = Math.min(...dsDiemThucTe);
+
+        if (tatCaMonNhanXetDat && diemThapNhat >= 6.5 && soMonTren9 >= 6) {
+            danhHieuToanQuoc = "HỌC SINH XUẤT SẮC 🏆";
+        } else if (tatCaMonNhanXetDat && diemThapNhat >= 6.5 && soMonTren8 >= 6) {
+            danhHieuToanQuoc = "HỌC SINH GIỎI 🏅";
+        } else if (tatCaMonNhanXetDat && diemThapNhat >= 5.0 && soMonTren65 >= 6) {
+            danhHieuToanQuoc = "HỌC SINH KHÁ 📈";
+        } else if (tatCaMonNhanXetDat && diemThapNhat >= 3.5) {
+            danhHieuToanQuoc = "HỌC LỰC ĐẠT (TRUNG BÌNH) ✅";
+        } else {
+            danhHieuToanQuoc = "HỌC LỰC CHƯA ĐẠT ⚠️";
+        }
+
+        document.getElementById('ketQua').innerHTML = `<span style="color:#dc3545; font-size:20px;">${danhHieuToanQuoc}</span>`;
+
+        let aiBox = document.getElementById('aiBox');
+        let aiNoiDung = document.getElementById('aiNoiDung');
+        document.getElementById('aiTitleBox').innerHTML = `✨ Trợ Lý AI Nhận Xét Học Đường:`;
+        aiBox.style.display = "block";
+        aiNoiDung.innerHTML = "<em>AI đang quét học bạ xét danh hiệu...</em>";
+
+        setTimeout(function() {
+            if (danhHieuToanQuoc.includes("XUẤT SẮC")) {
+                aiNoiDung.innerHTML = `🎉 <b>Quá chấn động!</b> Bạn đạt danh hiệu cao quý nhất trường. Chuẩn bị lên bục danh dự nhận giấy khen mang vinh quang về cho Gò Công Đông rồi! Lên CapCut giựt giựt flex banh máy thôi!`;
+            } else if (danhHieuToanQuoc.includes("GIỎI")) {
+                aiNoiDung.innerHTML = `🔥 <b>Tuyệt vời Học sinh Giỏi!</b> Bạn học rất đều và các môn lựa chọn gánh team cực mạnh. Điểm thấp nhất cũng không bị khống chế dưới 6.5. Phần thưởng này hoàn toàn xứng đáng!`;
+            } else if (danhHieuToanQuoc.includes("KHÁ")) {
+                aiNoiDung.innerHTML = `📈 <b>Danh hiệu Học sinh Khá!</b> Học bạ cực kỳ chỉn chu, các môn nằm ở mức rất an toàn. Chỉ cần cố gắng bứt phá thêm một vài môn ở năm học sau là chạm tay vào danh hiệu HS Giỏi rồi!`;
+            } else {
+                aiNoiDung.innerHTML = `✅ <b>Hạ cánh an toàn!</b> Học lực ở mức Đạt/Chưa Đạt. Quan trọng nhất là biết mình chưa tốt ở đâu để bổ sung kiến thức. Đừng nản lòng nhé, chúc bạn bứt phá thành công ở chặng đường tới!`;
+            }
+        }, 700);
+    }
+    function toggleTheme(){document.body.classList.toggle('dark');const b=document.getElementById('themeBtn');if(document.body.classList.contains('dark')){b.innerHTML='☀️ Chế độ sáng';localStorage.setItem('theme','dark');}else{b.innerHTML='🌙 Chế độ tối';localStorage.setItem('theme','light');}}
+</script>
+</body>
+</html>
