@@ -213,7 +213,8 @@
 
 <div class="container">
     <button id="themeBtn" class="theme-btn" onclick="toggleTheme()">🌙 Chế độ tối</button>
-    <img src="img.png" class="logo-goc">
+    <img id="logo" src="logo-light.png" class="logo-goc" alt="Logo">
+    <img id="logo" src="logo-dark.png" class="logo-goc" alt="logo">
 
     <h2 id="tieuDeChinh">TÍNH ĐIỂM C3</h2>
     <h3 id="tieuDePhu">⚠*Lưu ý ghi số điểm thập phân thì dùng dấu (.)</h3>
@@ -576,7 +577,20 @@
             }
         }, 700);
     }
-    function toggleTheme(){document.body.classList.toggle('dark');const b=document.getElementById('themeBtn');if(document.body.classList.contains('dark')){b.innerHTML='☀️ Chế độ sáng';localStorage.setItem('theme','dark');}else{b.innerHTML='🌙 Chế độ tối';localStorage.setItem('theme','light');}}
+   function toggleTheme() {
+    document.body.classList.toggle("dark");
+
+    const btn = document.getElementById("themeBtn");
+    const logo = document.getElementById("logo");
+
+    if (document.body.classList.contains("dark")) {
+        btn.innerHTML = "☀️ Chế độ sáng";
+        logo.src = "logo-dark.png";
+    } else {
+        btn.innerHTML = "🌙 Chế độ tối";
+        logo.src = "logo-light.png";
+    }
+}
 </script>
 </body>
 </html>
