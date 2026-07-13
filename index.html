@@ -16,7 +16,7 @@
         }
         .container {
             background: white;
-            padding: 30px 20px 40px 20px;
+            padding: 70px 20px 150px 20px;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             position: relative;
@@ -184,7 +184,6 @@
         .mon-item.nhan-xet { background-color: #fffde6; border-color: #ffeeba; grid-column: span 1; }
         .mon-item.nhan-xet-full { grid-column: span 2; background-color: #fffde6; border-color: #ffeeba; }
 
-        /* Nút đổi giao diện */
         .theme-btn{
             position:absolute;top:2px;left:15px;z-index:999;width:auto;padding:8px 12px;margin:0;
             font-size:13px;font-weight:bold;
@@ -207,14 +206,39 @@
         body.dark .result{color:#7CFC98}
         body.dark .ai-box{background:#2d243b;color:#fff}
 
+         .nut-bam{
+             position:absolute;top:1000px;left:150px;z-index:999;width:auto;padding:8px 12px;margin:0;
+             font-size:13px;font-weight:bold;
+             background:linear-gradient(135deg,#007bff,#4da3ff);
+             color:#fff;border:none;border-radius:20px;cursor:pointer;
+             transition:.3s;box-shadow:0 3px 10px rgba(0,123,255,.35)}
+        .nut-bam:hover{transform:scale(1.05)}
+        body.dark .nut-bam{
+            background:linear-gradient(135deg,#2d3748,#4a5568);
+            box-shadow:0 3px 10px rgba(255,255,255,.15)
+        }
+        body.dark{background:#121212;color:#eee}
+        body.dark .container{background:#1f1f1f;color:#eee;box-shadow:0 5px 15px rgba(255,255,255,.05)}
+        body.dark h2{color:#66b3ff} body.dark h3{color:#cfcfcf}
+        body.dark .input-group,body.dark .mon-item{background:#2b2b2b;border-color:#444}
+        body.dark input,body.dark select{background:#333;color:#fff;border:1px solid #555}
+        body.dark .formula-note,body.dark label{color:#ddd}
+        body.dark .tabs,body.dark .thong-ke{border-color:#444}
+        body.dark .thong-ke{background:#2b2b2b}
+        body.dark .result{color:#7CFC98}
+        body.dark .ai-box{background:#2d243b;color:#fff}
     </style>
 </head>
 <body>
 
 <div class="container">
+    <a href="https://vothikimanh1243-eng.github.io/web-logo/" class="nut-bam">
+       🎓IELTS
+    </a>
+
     <button id="themeBtn" class="theme-btn" onclick="toggleTheme()">🌙 Chế độ tối</button>
-    <img id="logo" src="logo-dark-removebg-preview.png" class="logo-goc" alt="Logo">
-    <img id="logo" src="logo-dark-removebg-preview.png" class="logo-goc" alt="logo">
+    <img src="logo-dark-removebg-preview.png" class="logo-goc">
+    <img src="logo-dark-removebg-preview.png" class="logo-goc">
 
     <h2 id="tieuDeChinh">TÍNH ĐIỂM C3</h2>
     <h3 id="tieuDePhu">⚠*Lưu ý ghi số điểm thập phân thì dùng dấu (.)</h3>
@@ -577,20 +601,7 @@
             }
         }, 700);
     }
-   function toggleTheme() {
-    document.body.classList.toggle("dark");
-
-    const btn = document.getElementById("themeBtn");
-    const logo = document.getElementById("logo");
-
-    if (document.body.classList.contains("dark")) {
-        btn.innerHTML = "☀️ Chế độ sáng";
-        logo.src = "logo-dark-removebg-preview.png";
-    } else {
-        btn.innerHTML = "🌙 Chế độ tối";
-        logo.src = "logo-dark-removebg-preview.png";
-    }
-}
+    function toggleTheme(){document.body.classList.toggle('dark');const b=document.getElementById('themeBtn');if(document.body.classList.contains('dark')){b.innerHTML='☀️ Chế độ sáng';localStorage.setItem('theme','dark');}else{b.innerHTML='🌙 Chế độ tối';localStorage.setItem('theme','light');}}
 </script>
 </body>
 </html>
